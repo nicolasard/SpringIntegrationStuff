@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class IntegrationConfiguration {
-    //# TODO: Spring Batch 의 Job, JobLauncher 를 구성해야 샘플이 정상적으로 동작함
+
     @Bean
     public FileToJobLaunchRequestTransformer fileToJobLaunchRequestTransformer(Job job) {
         return new FileToJobLaunchRequestTransformer(job, "filename");
