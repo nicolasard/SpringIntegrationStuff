@@ -9,17 +9,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
+import org.springframework.integration.dsl.SourcePollingChannelAdapterSpec;
 import org.springframework.integration.file.dsl.Files;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 @Configuration
 public class IntegrationConfiguration {
 
     @Bean
-    public FileToJobLaunchRequestTransformer fileToJobLaunchRequestTransformer(Job job) {
-        return new FileToJobLaunchRequestTransformer(job, "filename");
+    public FileToJobRequestTransformer fileToJobLaunchRequestTransformer(Job job) {
+        return new FileToJobRequestTransformer(job, "filename");
     }
 
     @Bean
@@ -28,11 +30,15 @@ public class IntegrationConfiguration {
     }
 
     @Bean
-    public IntegrationFlow fileToBatchFlow(FileToJobLaunchRequestTransformer fileToJobLaunchRequestTransformer
+    public IntegrationFlow fileToBatchFlow(FileToJobRequestTransformer fileToJobLaunchRequestTransformer
             , JobLaunchingMessageHandler jobLaunchingMessageHandler
             , @Value("file:${user.home}/customerstoimport/new/") File directory) {
         return IntegrationFlows.from(
-                Files.inboundAdapter(directory).patternFilter("customers-*.txt"), s -> s.poller(Pollers.fixedRate(10, TimeUnit.SECONDS)))
+                Files.inboundAdapter(directory).patternFilter("customers-*.txt"), new Consumer<SourcePollingChannelAdapterSpec>() {
+					public void accept(SourcePollingChannelAdapterSpec s) {
+						s.poller(Pollers.fixedRate(10, TimeUnit.SECONDS));
+					}
+				})
                 .transform(fileToJobLaunchRequestTransformer)
                 .handle(jobLaunchingMessageHandler)
                 .get();

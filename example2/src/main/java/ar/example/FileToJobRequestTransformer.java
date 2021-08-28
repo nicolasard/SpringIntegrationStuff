@@ -7,11 +7,11 @@ import org.springframework.integration.annotation.Transformer;
 
 import java.io.File;
 
-public class FileToJobLaunchRequestTransformer {
+public class FileToJobRequestTransformer {
     private final Job job;
     private final String fileParameterName;
 
-    public FileToJobLaunchRequestTransformer(Job job, String fileParameterName) {
+    public FileToJobRequestTransformer(Job job, String fileParameterName) {
         this.job = job;
         this.fileParameterName = fileParameterName;
     }
