@@ -1,10 +1,11 @@
 package ar.example;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.integration.launch.JobLaunchingMessageHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
@@ -17,12 +18,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Configuration
+@ComponentScan(basePackageClasses = FileProcessingJob.class)
 public class IntegrationConfiguration {
-
+	
     @Bean
-    public FileToJobRequestTransformer fileToJobLaunchRequestTransformer(Job job) {
-        return new FileToJobRequestTransformer(job, "filename");
-    }
+    public FileToJobRequestTransformer fileToJobLaunchRequestTransformer(FileProcessingJob fileProcessingJob) {
+        return new FileToJobRequestTransformer(fileProcessingJob.getJob(), "filename");
+     }
 
     @Bean
     public JobLaunchingMessageHandler jobLaunchingMessageHandler(JobLauncher jobLauncher) {
